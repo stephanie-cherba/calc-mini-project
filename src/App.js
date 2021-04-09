@@ -1,5 +1,7 @@
 import {useState } from 'react'
 import {createUseStyles} from 'react-jss'
+import {Dialog} from '@material-ui/core'
+
 
 const useStyles = createUseStyles({
   topRow: {
@@ -64,6 +66,24 @@ const useStyles = createUseStyles({
   period: {
     fontSize:'51px'
   },
+  dialogContent: {
+    padding: '20px',
+    borderBottom: '1px #d8d8d8 solid',
+  },
+  buttonContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  cancel: {
+    backgroundColor: '#eef0ef',
+    borderRadius: '25px',
+    width:'200px',
+    margin:'5px',
+    padding:'5px 10px',
+    fontSize: '20px',
+    border: '1px #9e9e9e solid'
+  },
   '@media (min-width: 510px)': {
     clear: {
       
@@ -116,29 +136,31 @@ export const App = () => {
   const [num2, setNum2] = useState('')
   const [isDone, setIsDone] = useState(false)
   const [operation, setOperation] = useState('')
-  const arr = []
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const classes = useStyles()
 
+  const handleOpenDialog = () => setIsDialogOpen(true)
+  const handleCloseDialog = () => setIsDialogOpen(false)
   const handleClick = (e) => {
     e.preventDefault()
     const name = e.target.name    
-    if(isDone ==='true'){
-      setCurrentValue('')
-      setNum1('')
-      setOperation('')
+    if(isDone && name !== 'C'){
+      handleOpenDialog()
+      return
     }
     if(name === 'C' ){
       setCurrentValue('')
-      
+      setNum1('')
+      setNum2('')
+      setIsDone(false)
+      setOperation('')
     } else if(name === '+' || name === '-' || name === '/' || name === '*'){
       setNum1(currentValue)
-      arr.push('currentValue')
       setOperation(name)
-      arr.push(name)
       setCurrentValue('')
     } else if(name === '='){
       setNum2(currentValue)
-      arr.push(currentValue)
+      setIsDone(true)
       if(operation === '+'){
         const newNumber = parseInt(num1) + parseInt(currentValue)
         setCurrentValue(newNumber)
@@ -152,156 +174,178 @@ export const App = () => {
         const newNumber = parseInt(num1) * parseInt(currentValue)
         setCurrentValue(newNumber)
       }
-      setIsDone(true)
     }else{
       setCurrentValue((currentValue && isDone === false) ? currentValue + name : name)
     }
   }
   return (
-    <div>
-      <div className={classes.topRow}>
-        <button 
-          className={classes.clear} 
-          name='C' 
-          onClick={e => {handleClick(e)}}
+    <>
+      <div>
+        <div className={classes.topRow}>
+          <button 
+            className={classes.clear} 
+            name='C' 
+            onClick={e => {handleClick(e)}}
+            >
+              C
+            </button>
+          <div className={classes.screen}>
+            {
+              num1 
+              ? 
+                isDone && operation == '/'
+                ?
+                  num1 + '÷' + num2 + '=' + currentValue
+                :
+                  isDone && operation == '*'
+                  ?
+                    num1 + '×' + num2 + '=' + currentValue
+                  :
+                    isDone
+                    ?
+                      num1 + operation + num2 + '=' + currentValue
+                    :
+                      operation == '/' 
+                      ?
+                        num1 + '÷' + currentValue
+                      :
+                        operation == '*'
+                        ?
+                          num1 + '×' + currentValue
+                        :
+                          num1 + operation + currentValue
+              : 
+                currentValue
+            }
+            </div>
+        </div>
+        <div className={classes.row}>
+          <button 
+            className={classes.numbers} 
+            name={7} 
+            onClick={e => handleClick(e)}
           >
-            C
+            7
           </button>
-          {console.log(num1, operation, num2, currentValue)}
-        <div className={classes.screen}>
-          {
-            num1 
-            ? 
-              isDone 
-              ?
-                num1 + operation + num2 + '=' + currentValue
-              :
-                num1 + operation + currentValue
-            : 
-              currentValue
-          }
-          </div>
+          <button 
+            className={classes.numbers} 
+            name={8} 
+            onClick={e => handleClick(e)}
+          >
+            8
+          </button>
+          <button 
+            className={classes.numbers} 
+            name={9}
+            onClick={e => handleClick(e)}
+          >
+            9
+          </button>
+          <button 
+            className={`${classes.operations} ${classes.divide}`} 
+            name='/' 
+            onClick={e => handleClick(e)}
+          >
+            ÷
+          </button>
+        </div>
+        <div className={classes.row}>
+          <button 
+            className={classes.numbers} 
+            name={4} 
+            onClick={e => handleClick(e)}
+          >
+            4
+          </button>
+          <button 
+            className={classes.numbers} 
+            name={5}
+            onClick={e => handleClick(e)}
+          >
+            5
+          </button>
+          <button 
+            className={classes.numbers} 
+            name={6}
+            onClick={e => handleClick(e)}
+          >
+            6
+          </button>
+          <button 
+            className={`${classes.operations} ${classes.multiply}`} 
+            name='*' 
+            onClick={e => handleClick(e)}
+          >
+            ×
+          </button>
+        </div>
+        <div className={classes.row}>
+          <button 
+            className={classes.numbers} 
+            name={1}
+            onClick={e => handleClick(e)}
+          >
+            1
+          </button>
+          <button 
+            className={classes.numbers} 
+            name={2}
+            onClick={e => handleClick(e)}
+          >
+            2
+          </button>
+          <button 
+            className={classes.numbers} 
+            name={3}
+            onClick={e => handleClick(e)}
+          >
+            3
+          </button>
+          <button 
+            className={`${classes.operations} ${classes.subtract}`} 
+            name='-' 
+            onClick={e => handleClick(e)}
+          >
+            -
+          </button>
+        </div>
+        <div className={classes.row}>
+          <button 
+            className={classes.numbers} 
+            name={0}
+            onClick={e => handleClick(e)}
+          >
+            0
+          </button>
+          <button 
+            className={`${classes.operations} ${classes.period}`} 
+            name='.' 
+            onClick={e => handleClick(e)}
+          >
+            .
+          </button>
+          <button 
+            className={`${classes.operations} ${classes.equals}`} 
+            name='=' 
+            onClick={e => {handleClick(e); setIsDone(true)}}
+          >
+            =
+          </button>
+          <button 
+            className={`${classes.operations} ${classes.add}`} 
+            name='+' 
+            onClick={e => handleClick(e)}
+          >
+            +
+          </button>
+        </div>
       </div>
-      <div className={classes.row}>
-        <button 
-          className={classes.numbers} 
-          name={7} 
-          onClick={e => handleClick(e)}
-        >
-          7
-        </button>
-        <button 
-          className={classes.numbers} 
-          name={8} 
-          onClick={e => handleClick(e)}
-        >
-          8
-        </button>
-        <button 
-          className={classes.numbers} 
-          name={9}
-          onClick={e => handleClick(e)}
-        >
-          9
-        </button>
-        <button 
-          className={`${classes.operations} ${classes.divide}`} 
-          name='/' 
-          onClick={e => handleClick(e)}
-        >
-          ÷
-        </button>
-      </div>
-      <div className={classes.row}>
-        <button 
-          className={classes.numbers} 
-          name={4} 
-          onClick={e => handleClick(e)}
-        >
-          4
-        </button>
-        <button 
-          className={classes.numbers} 
-          name={5}
-          onClick={e => handleClick(e)}
-        >
-          5
-        </button>
-        <button 
-          className={classes.numbers} 
-          name={6}
-          onClick={e => handleClick(e)}
-        >
-          6
-        </button>
-        <button 
-          className={`${classes.operations} ${classes.multiply}`} 
-          name='*' 
-          onClick={e => handleClick(e)}
-        >
-          ×
-        </button>
-      </div>
-      <div className={classes.row}>
-        <button 
-          className={classes.numbers} 
-          name={1}
-          onClick={e => handleClick(e)}
-        >
-          1
-        </button>
-        <button 
-          className={classes.numbers} 
-          name={2}
-          onClick={e => handleClick(e)}
-        >
-          2
-        </button>
-        <button 
-          className={classes.numbers} 
-          name={3}
-          onClick={e => handleClick(e)}
-        >
-          3
-        </button>
-        <button 
-          className={`${classes.operations} ${classes.subtract}`} 
-          name='-' 
-          onClick={e => handleClick(e)}
-        >
-          -
-        </button>
-      </div>
-      <div className={classes.row}>
-        <button 
-          className={classes.numbers} 
-          name={0}
-          onClick={e => handleClick(e)}
-        >
-          0
-        </button>
-        <button 
-          className={`${classes.operations} ${classes.period}`} 
-          name='.' 
-          onClick={e => handleClick(e)}
-        >
-          .
-        </button>
-        <button 
-          className={`${classes.operations} ${classes.equals}`} 
-          name='=' 
-          onClick={e => {handleClick(e); setIsDone(true)}}
-        >
-          =
-        </button>
-        <button 
-          className={`${classes.operations} ${classes.add}`} 
-          name='+' 
-          onClick={e => handleClick(e)}
-        >
-          +
-        </button>
-      </div>
-    </div>
+      <Dialog open={isDialogOpen} >
+        <div className={classes.dialogContent}>You must press clear before starting a new problem</div>
+        <div className={classes.buttonContainer}>
+          <button className={classes.cancel} onClick={handleCloseDialog}>OK</button>
+        </div>
+      </Dialog>
+    </>
   )
 }
